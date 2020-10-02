@@ -10,17 +10,33 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-from pathlib import Path
+import os
+import json
+import datetime
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+# \review-server\re_view\config
+_BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# \review-server\re_view
+BASE_DIR = os.path.dirname(_BASE)
+# \review-server
+ROOT_DIR = os.path.dirname(BASE_DIR)
 
+CONFIG_SECRET_DIR = os.path.join(ROOT_DIR, ".config_secret")
+CONFIG_SECRET_COMMON_FILE = os.path.join(CONFIG_SECRET_DIR, "settings_common.json")
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
+config_secret_common = json.loads(open(CONFIG_SECRET_COMMON_FILE).read())
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'xcmoc#te1r_vwze7dg4fsnc0@rfkf%au@5s1w^!l5ewhjfi_48'
+SECRET_KEY = config_secret_common['django']['secret_key']
+
+JWT_AUTH = {
+    "JWT_REFRESH_EXPIRATION_DELTA": datetime.timedelta(days=7),
+    "JWT_EXPIRATION_DELTA": datetime.timedelta(days=2),
+    "JWT_ALLOW_REFRESH": True,
+    "JWT_SECRET_KEY": config_secret_common["jwt"]["secret_key"],
+    "JWT_ALGORITHM": config_secret_common["jwt"]["algorithm"],
+}
+
+DATABASES = config_secret_common['django']['database']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -73,12 +89,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 
 # Password validation

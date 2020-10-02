@@ -2,7 +2,9 @@
 
 ### 사용 모듈
 ` python
-pip install django-allauth  
+pip install django-allauth
+`
+`
 pip install django-rest-auth
 `
 

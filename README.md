@@ -2,9 +2,7 @@
 
 ### 사용 모듈
 ` python
-pip install django-allauth
-`
-`
+pip install django-allauth  
 pip install django-rest-auth
 `
 
@@ -13,7 +11,7 @@ pip install django-rest-auth
 /rest-auth/login/ (POST)
 - username
 - email
-- password
+- password  
 Returns Token key
 
 /rest-auth/logout/ (POST)
@@ -34,7 +32,7 @@ Returns Token key
 /rest-auth/user/ (GET, PUT, PATCH)
 - username
 - first_name
-- last_name
+- last_name  
 Returns pk, username, email, first_name, last_name
 
 ### Registration

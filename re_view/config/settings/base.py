@@ -22,7 +22,8 @@ BASE_DIR = os.path.dirname(_BASE)
 ROOT_DIR = os.path.dirname(BASE_DIR)
 
 CONFIG_SECRET_DIR = os.path.join(ROOT_DIR, ".config_secret")
-CONFIG_SECRET_COMMON_FILE = os.path.join(CONFIG_SECRET_DIR, "settings_common.json")
+CONFIG_SECRET_COMMON_FILE = os.path.join(
+    CONFIG_SECRET_DIR, "settings_common.json")
 
 config_secret_common = json.loads(open(CONFIG_SECRET_COMMON_FILE).read())
 
@@ -41,7 +42,7 @@ DATABASES = config_secret_common['django']['database']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','127.0.0.1',]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', ]
 
 
 # Application definition
@@ -54,7 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',  # restframework 앱 추가
-    'apps.account',
+    'account',
 ]
 
 MIDDLEWARE = [
@@ -90,7 +91,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
 
 
 # Password validation

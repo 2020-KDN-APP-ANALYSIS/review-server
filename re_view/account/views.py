@@ -5,7 +5,8 @@ import json
 import bcrypt
 import jwt
 
-from westa_posting.settings import SECRET_KEY
+# from re_view.config.settings.base import JWT_AUTH
+from django.conf import settings
 from .models import Account
 
 from django.views import View
@@ -15,6 +16,12 @@ from account.authentication import JSONWebTokenAuthentication
 
 
 class SignUpView(View):
+    def __init__(self):
+        USER_SETTINGS = getattr(settings, "JWT_AUTH", None)
+
+        self.JWT_SECRET_KEY = USER_SETTINGS["JWT_SECRET_KEY"]
+        self.JWT_ALGORITHM = USER_SETTINGS["JWT_ALGORITHM"]
+
     def post(self, request):
         data = json.loads(request.body)
         try:
@@ -42,7 +49,7 @@ class SignUpView(View):
             #----------토큰 발행----------#
 
             token = jwt.encode(
-                {'userid': data['userid']}, SECRET_KEY, algorithm="HS256")
+                {'userid': data['userid']}, self.JWT_SECRET_KEY, algorithm="HS256")
             token = token.decode('utf-8')      # 유니코드 문자열로 디코딩
 
             #-----------------------------#
@@ -53,6 +60,12 @@ class SignUpView(View):
 
 
 class SignInView(View):
+    def __init__(self):
+        USER_SETTINGS = getattr(settings, "JWT_AUTH", None)
+
+        self.JWT_SECRET_KEY = USER_SETTINGS["JWT_SECRET_KEY"]
+        self.JWT_ALGORITHM = USER_SETTINGS["JWT_ALGORITHM"]
+
     def post(self, request):
         data = json.loads(request.body)
 
@@ -65,7 +78,7 @@ class SignInView(View):
                     #----------토큰 발행----------#
 
                     token = jwt.encode(
-                        {'userid': data['userid']}, SECRET_KEY, algorithm="HS256")
+                        {'userid': data['userid']}, self.JWT_SECRET_KEY, algorithm="HS256")
                     token = token.decode('utf-8')      # 유니코드 문자열로 디코딩
 
                     #-----------------------------#
@@ -81,6 +94,12 @@ class SignInView(View):
 
 
 class UserDelete(View):
+    def __init__(self):
+        USER_SETTINGS = getattr(settings, "JWT_AUTH", None)
+
+        self.JWT_SECRET_KEY = USER_SETTINGS["JWT_SECRET_KEY"]
+        self.JWT_ALGORITHM = USER_SETTINGS["JWT_ALGORITHM"]
+
     def delete(self, request):
         data = json.loads(request.body)
 
@@ -91,7 +110,7 @@ class UserDelete(View):
                 list_1 = auth.split(" ")
 
                 user_token_info = jwt.decode(
-                    list_1[1], SECRET_KEY, algorithm='HS256')
+                    list_1[1], self.JWT_SECRET_KEY, algorithm='HS256')
 
                 if Account.objects.filter(userid=user_token_info['userid']).exists():
                     user = Account.objects.get(userid=data['userid'])
@@ -106,11 +125,17 @@ class UserDelete(View):
 
 
 class TokenCheckView(View):
+    def __init__(self):
+        USER_SETTINGS = getattr(settings, "JWT_AUTH", None)
+
+        self.JWT_SECRET_KEY = USER_SETTINGS["JWT_SECRET_KEY"]
+        self.JWT_ALGORITHM = USER_SETTINGS["JWT_ALGORITHM"]
+
     def post(self, request):
         data = json.loads(request.body)
 
         user_token_info = jwt.decode(
-            data['token'], SECRET_KEY, algorithm='HS256')
+            data['token'], self.JWT_SECRET_KEY, algorithm='HS256')
 
         if Account.objects.filter(userid=user_token_info['userid']).exists():
             return JsonResponse({'message': '유저 정보가 DB에 있는 정보와 일치'}, status=200)

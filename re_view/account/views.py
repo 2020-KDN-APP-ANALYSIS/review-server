@@ -13,6 +13,7 @@ from django.views import View
 from django.http import JsonResponse, HttpResponse
 
 from account.authentication import JSONWebTokenAuthentication
+from .serializers import AccountSerializer
 
 
 class SignUpView(View):
@@ -127,6 +128,14 @@ class UserDelete(View):
                     return JsonResponse({'message': '아이디 틀림'}, status=400)
         else:
             return JsonResponse({'message': '토큰 비어있음'}, status=400)
+
+
+class ALL_user(View):
+    serializer_class = AccountSerializer
+
+    def get(self, request):
+        user = Account.objects.all()
+        return JsonResponse({'message': user}, status=400)
 
 
 class TokenCheckView(View):

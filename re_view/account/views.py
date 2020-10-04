@@ -127,7 +127,7 @@ class UserDelete(View):
                 else:
                     return JsonResponse({'message': '아이디 틀림'}, status=400)
         else:
-            return JsonResponse({'message': '토큰 비어있음'}, status=400)
+            return JsonResponse({'message': '토큰 비어있음.'}, status=400)
 
 
 class ALL_user(View):

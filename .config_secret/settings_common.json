@@ -1,0 +1,19 @@
+{
+  "django": {
+    "secret_key": "9VfHSLWd7mcDw3EyBvnsW8nwCSNr1iqN",
+    "database": {
+      "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "user_schema",
+        "USER": "root",
+        "PASSWORD": "00000000",
+        "HOST": "localhost",
+        "PORT": "3306"
+      }
+    }
+  },
+  "jwt": {
+    "secret_key": "Kw6ity3sq4gMskQoUGakp1MQFkYttujG",
+    "algorithm": "HS256"
+  }
+}

@@ -49,11 +49,6 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer = PostSerializer(queryset, many=True)
 
         return Response(serializer.data)
-    
-
-
-    def destroy(self, request, pk):
-        pass
 
 
         
@@ -106,8 +101,7 @@ class PostViewSet(viewsets.ModelViewSet):
         return self.update(request, *args, **kwargs)
 
 
-        def perform_destroy(self, instance):
-            instance.delete()
+        
 
 
 

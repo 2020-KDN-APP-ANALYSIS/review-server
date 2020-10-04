@@ -43,7 +43,11 @@ class SignUpView(View):
             # DB 저장
             Account(
                 userid=data['userid'],
-                password=password_crypt                               # 암호화된 비밀번호를 DB에 저장
+                password=password_crypt,                           # 암호화된 비밀번호를 DB에 저장
+                user_name=data['user_name'],
+                gender=data['gender'],
+                user_email=data['user_email'],
+                phonenumber=data['phonenumber']
             ).save()
 
             #----------토큰 발행----------#
@@ -82,12 +86,13 @@ class SignInView(View):
                     token = token.decode('utf-8')      # 유니코드 문자열로 디코딩
 
                     #-----------------------------#
+                    print(user)
                     return JsonResponse({"token": token, "user": data}, status=200)
 
                 else:
                     return JsonResponse({'message': '비밀번호가 틀렸어요'}, status=401)
 
-            return JsonResponse({'message': '등록되지 않은 이메일 입니다.'}, status=400)
+            return JsonResponse({'message': '등록되지 않은 userid입니다.'}, status=400)
 
         except KeyError:
             return JsonResponse({"message": "INVALID_KEYS"}, status=400)
@@ -101,27 +106,27 @@ class UserDelete(View):
         self.JWT_ALGORITHM = USER_SETTINGS["JWT_ALGORITHM"]
 
     def delete(self, request):
-        data = json.loads(request.body)
+        # 토큰 검사하기
+        auth = request.META.get("HTTP_AUTHORIZATION")
 
-        if Account.objects.filter(userid=data['userid']).exists():
-            # 인증하기
-            auth = request.META.get("HTTP_AUTHORIZATION")
-            if auth != None:
-                list_1 = auth.split(" ")
+        if auth != None:
+            list_1 = auth.split(" ")
 
-                user_token_info = jwt.decode(
-                    list_1[1], self.JWT_SECRET_KEY, algorithm='HS256')
+            user_token_info = jwt.decode(
+                list_1[1], self.JWT_SECRET_KEY, algorithm='HS256')
 
-                if Account.objects.filter(userid=user_token_info['userid']).exists():
+            if Account.objects.filter(userid=user_token_info['userid']).exists():
+                # 토큰 있음
+                data = json.loads(request.body)
+
+                if Account.objects.filter(userid=data['userid']).exists():
                     user = Account.objects.get(userid=data['userid'])
                     user.delete()
                     return JsonResponse({'message': '삭제 성공'}, status=200)
-            else:
-                return JsonResponse({'message': '토큰 없음'}, status=400)
-        elif Account.objects.filter(userid=data['userid']) == None:
-            return JsonResponse({'message': '아이디 없음'}, status=400)
+                else:
+                    return JsonResponse({'message': '아이디 틀림'}, status=400)
         else:
-            return JsonResponse({'message': '아이디 틀림'}, status=400)
+            return JsonResponse({'message': '토큰 비어있음'}, status=400)
 
 
 class TokenCheckView(View):

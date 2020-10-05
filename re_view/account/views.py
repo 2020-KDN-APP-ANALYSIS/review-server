@@ -11,6 +11,9 @@ from .models import Account
 
 from django.views import View
 from django.http import JsonResponse, HttpResponse
+from rest_framework.response import Response
+from rest_framework import status
+from django.core import serializers
 
 from account.authentication import JSONWebTokenAuthentication
 from .serializers import AccountSerializer
@@ -131,11 +134,14 @@ class UserDelete(View):
 
 
 class ALL_user(View):
-    serializer_class = AccountSerializer
 
     def get(self, request):
         user = Account.objects.all()
-        return JsonResponse({'message': user}, status=400)
+        data = serializers.serialize('json', user)
+        return HttpResponse(data, content_type="application/json")
+
+
+
 
 
 class TokenCheckView(View):

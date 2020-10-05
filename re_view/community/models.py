@@ -17,8 +17,7 @@ class Post(models.Model):
 class Answer(models.Model):
     answer_token = models.CharField(("answer_token"), max_length=50, primary_key=True)
     post_token = models.ForeignKey("Post", on_delete=models.CASCADE)
-    userid = models.ForeignKey("Account.Account", on_delete=mode1ls.CASCADE)
-    userid = models.CharField("userid", max_length=20)
+    userid = models.ForeignKey("account.Account", on_delete=models.CASCADE)
     content = models.TextField(("Answer content"))
     pub_date = models.DateTimeField(("Post pusblied Date"), auto_now_add=True)
     like_count = models.IntegerField(("like count"), default=0)

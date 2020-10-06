@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from django.shortcuts import render
 from .models import Post, Answer
@@ -6,35 +7,35 @@ from rest_framework import viewsets, generics, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from django.core.serializers.json import DjangoJSONEncoder
+from .authentication import JSONTokenAuthentication
+from rest_framework import status
 
 # Create your views here.
 
 class PostViewSet(viewsets.ModelViewSet):
 
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JSONWebTokenAuthentication]
 
-    
     def create(self, request, *args, **kwargs):
-        
-        query_data = request.data
-        
-        pub_time = datetime.now().strftime('%Y%m%d%H%M%S')
-        query_data["post_token"] = pub_time + request.data["userid"] #post_token: pub_time + userid
-        
-        serializer = PostSerializer(data=query_data)
+        if JSONTokenAuthentication.authenticate(request):
+            query_data = request.data
+            
+            pub_time = datetime.now().strftime('%Y%m%d%H%M%S')
+            query_data["post_token"] = pub_time + request.data["userid"] #post_token: pub_time + userid
+            
+            serializer = PostSerializer(data=query_data)
 
-        if not serializer.is_valid():
-            return Response(serializer.errors)
-        
-        serializer.save()
+            if not serializer.is_valid():
+                return Response(serializer.errors)
+            
+            serializer.save()
 
-        return Response(serializer.data)
+            return Response(serializer.data)
+        else:
+             return Response("Action denied: Not logged in ", status=status.HTTP_401_UNAUTHORIZED)
             
 
-
+20201006191138test12345
     def list(self, request):
         
         queryset = Post.objects.all()
@@ -53,54 +54,42 @@ class PostViewSet(viewsets.ModelViewSet):
 
         
     @action(detail=True, methods=['patch'])
-    def view(self, request):
+    def view(self, request, pk=None):
         
-        obj = Post.objects.filter(post_token=self.kwargs["pk"])
+        obj = Post.objects.get(post_token=pk)
+        #obj = json.dumps(list(obj)[0], cls=DjangoJSONEncoder)
+        
+        obj.view_count += 1
+        obj.save()
 
-        data = {
-            "post_token": obj["post_token"],
-            "userid": obj["userid"],
-            "title": obj["title"],
-            "content": obj["content"],
-            "pub_date": obj["pub_date"],
-            "view_count": obj["view_count"] + 1,
-            "like_count": obj["like_count"],
-            "image": obj["image"]
-        }
-        serializer = PostSerializer(data=data)
-
-        if not serializer.is_valid():
-            return Response(serializer.errors)
-
-        serializer.save()
-
-        return self.update(request, *args, **kwargs)
+        return Response("update success", status=status.HTTP_200_OK)
 
 
     @action(detail=True, methods=['patch'])
-    def like(self, request):
-        obj = Post.objects.filter(post_token=self.kwargs["pk"])
+    def like(self, request, pk=None):
 
-        data = {
-            "post_token": obj["post_token"],
-            "userid": obj["userid"],
-            "title": obj["title"],
-            "content": obj["content"],
-            "pub_date": obj["pub_date"],
-            "view_count": obj["view_count"],
-            "like_count": obj["like_count"] + 1,
-            "image": obj["image"]
-        }
-        serializer = PostSerializer(data=data)
+        if JSONTokenAuthentication.authenticate(request):
 
-        if not serializer.is_valid():
-            return Response(serializer.errors)
+            obj = Post.objects.get(post_token=pk)
+        
+            obj.like_count += 1
+            obj.save()
 
-        serializer.save()
+            return Response("update success", status=status.HTTP_200_OK)
+        else:
+            return Response("Action denied: Not logged in ", status=status.HTTP_401_UNAUTHORIZED)
 
-        return self.update(request, *args, **kwargs)
+    def destroy(self, request, pk):
+        try:
+            answer_queryset = Answer.objects.get(post_token=pk)
+            answer_queryset.delete()
+            post_queryset = Post.objects.get(post_token=pk)
+            post_queryset.delete()
 
+        except Exception as err:
+            raise "Error: {}".format(err)
 
+        return Response("delete succuess")
         
 
 
@@ -110,72 +99,67 @@ class GetPostAPI(mixins.ListModelMixin, generics.GenericAPIView):
 
     serializer_class = PostSerializer
 
-    def list(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         
-        queryset = Post.objects.all().filter(userid=self.kwargs["userid"])
+        queryset = Post.objects.filter(userid=self.kwargs["user_id"])
         
-        serializer = PostSerializer(data=queryset, many=True)
+        serializer = PostSerializer(queryset, many=True)
         
         return Response(serializer.data)
 
 
 
 class AnswerViewSet(viewsets.ModelViewSet):
+    
+    @action(detail=True, methods=['get'])
+    def show(self, request, pk=None):
 
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JSONWebTokenAuthentication]
-
-    @action(detail=True)
-    def show(self, request, pk):
-
-        queryset = Answer.objects.all().filter(post_token=pk)
-
-        serializer = AnswerSerializer(data=queryset, many=True)
+        queryset = Answer.objects.filter(post_token=pk).all()
+        serializer = AnswerSerializer(queryset, many=True)
 
         return Response(serializer.data)
 
     def create(self, request):
         
-        query_data = request.data
-        
-        pub_time = datetime.now().strftime('%Y%m%d%H%M%S')
+        if JSONTokenAuthentication.authenticate(request):
+            query_data = request.data
+            
+            pub_time = datetime.now().strftime('%Y%m%d%H%M%S')
 
-        #answer_token: pub_time + post_token + userid
-        query_data["answer_token"] = pub_time + request.data['post_token'] + request.data["userid"] 
-        
-        serializer = AnswerSerializer(data=query_data)
+            #answer_token: pub_time + post_token + userid
+            query_data["answer_token"] = pub_time + request.data['post_token'] + request.data["userid"] 
+            
+            serializer = AnswerSerializer(data=query_data)
 
-        if not serializer.is_valid():
-            return Response(serializer.errors)
-        
-        serializer.save()
+            if not serializer.is_valid():
+                return Response(serializer.errors)
+            
+            serializer.save()
 
-        return Response(serializer.data)
-        
+            return Response(serializer.data)
+        else:
+            return Response("Action denied: Not logged in ", status=status.HTTP_401_UNAUTHORIZED)   
     
     def destroy(self, request, pk):
-        pass
+        try:
+
+            queryset = Answer.objects.get(answer_token=pk)
+            queryset.delete()
+        except Exception as err:
+            raise "Error: {}".format(err)
+        return Response("delete succuess")
 
 
     @action(detail=True, methods=['patch'])
-    def like(self, request):
-        obj = Answer.objects.filter(answer_token=self.kwargs["pk"])
+    def like(self, request, pk=None):
 
-        data = {
-            "answer_token": obj["answer_token"],
-            "post_token": obj["post_token"],
-            "userid": obj["userid"],
-            "content": obj["content"],
-            "pub_date": obj["pub_date"],
-            "like_count": obj["like_count"] + 1,
-        }
-        serializer = AnswerSerializer(data=data)
+        if JSONTokenAuthentication.authenticate(request):
 
-        if not serializer.is_valid():
-            return Response(serializer.errors)
-
-        serializer.save()
-
-        return self.update(request, *args, **kwargs)
+            obj = Answer.objects.get(answer_token=pk)
+            obj.like_count +=1
+            obj.save()
+            return Response("update success")
+        else:
+            return Response("Action denied: Not logged in ", status=status.HTTP_401_UNAUTHORIZED)   
 
         

@@ -13,5 +13,5 @@ router.register(r'answer', AnswerViewSet, basename="answer")
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('<user_id>', GetPostAPI.as_view())
+    path('<user_id>/', GetPostAPI.as_view())
 ]

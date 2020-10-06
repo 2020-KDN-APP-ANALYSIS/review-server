@@ -34,7 +34,7 @@ JWT_AUTH = {
     "JWT_EXPIRATION_DELTA": datetime.timedelta(days=2),
     "JWT_ALLOW_REFRESH": True,
     "JWT_SECRET_KEY": config_secret_common["jwt"]["secret_key"],
-    "JWT_ALGORITHM": config_secret_common["jwt"]["algorithm"],
+    "JWT_ALGORITHM": config_secret_common["jwt"]["algorithm"]
 }
 
 DATABASES = config_secret_common['django']['database']
@@ -133,11 +133,3 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        ('rest_framework_jwt.authentication.JSONWebTokenAuthentication',)
-    )
-}

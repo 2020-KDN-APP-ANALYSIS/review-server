@@ -35,17 +35,16 @@ class PostViewSet(viewsets.ModelViewSet):
              return Response("Action denied: Not logged in ", status=status.HTTP_401_UNAUTHORIZED)
             
 
-20201006191138test12345
     def list(self, request):
         
         queryset = Post.objects.all()
         order = self.request.query_params.get('order', None)
 
         if order == "popular":
-            queryset = queryset.order_by("-view_count", "-pub_date")
+            queryset = queryset.order_by("-view_count", "-publish_date")
 
         if order == "like":
-            queryset = queryset.order_by("-like_count", "-pub_date")
+            queryset = queryset.order_by("-like_count", "-publish_date")
 
         serializer = PostSerializer(queryset, many=True)
 
@@ -101,7 +100,7 @@ class GetPostAPI(mixins.ListModelMixin, generics.GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         
-        queryset = Post.objects.filter(userid=self.kwargs["user_id"])
+        queryset = Post.objects.filter(user=self.kwargs["user_id"])
         
         serializer = PostSerializer(queryset, many=True)
         

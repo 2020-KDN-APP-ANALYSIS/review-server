@@ -4,31 +4,36 @@ from .parser import PlaystoreAppParser
 def icon_view(request,app_id):
     if request.method == "GET":
         url = 'https://play.google.com/store/apps/details?id=' + app_id + '&hl=ko&gl=KR'
-        icon_url = PlaystoreAppParser(url).get_icon()
+        playstore_app_parser = PlaystoreAppParser(url)
+        icon_url = playstore_app_parser.get_icon()
         return JsonResponse({'icon' : icon_url})
 
 def title_view(request, app_id):
     if request.method == "GET":
         url = 'https://play.google.com/store/apps/details?id=' + app_id + '&hl=ko&gl=KR'
-        title_url = PlaystoreAppParser.get_title()
+        playstore_app_parser = PlaystoreAppParser(url)
+        title_url = playstore_app_parser.get_title()
         return JsonResponse({'title' : title_url})
     
 def publisher_view(request, app_id):
     if request.method == "GET":
         url = 'https://play.google.com/store/apps/details?id=' + app_id + '&hl=ko&gl=KR'
-        publisher_url = PlaystoreAppParser.get_publisher()
+        playstore_app_parser = PlaystoreAppParser(url)
+        publisher_url = playstore_app_parser.get_publisher()
         return JsonResponse({'publisher' : publisher_url})
     
 def description_view(request, app_id):
     if request.method == "GET":
         url = 'https://play.google.com/store/apps/details?id=' + app_id + '&hl=ko&gl=KR'
-        description_url = PlaystoreAppParser.get_description()
+        playstore_app_parser = PlaystoreAppParser(url)
+        description_url = playstore_app_parser.get_description()
         return JsonResponse({'description' : description_url})
     
 def matrials_view(request, app_id):
     if request.method == "GET":
         url = 'https://play.google.com/store/apps/details?id=' + app_id + '&hl=ko&gl=KR'
-        matrials_url = PlaystoreAppParser.get_matrials()
+        playstore_app_parser = PlaystoreAppParser(url)
+        matrials_url = playstore_app_parser.get_matrials()
         return JsonResponse({'matrials' : matrials_url})
     
 def app_total_view(request, app_id):

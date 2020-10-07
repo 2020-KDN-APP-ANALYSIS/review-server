@@ -57,7 +57,8 @@ INSTALLED_APPS = [
     'rest_framework',  # restframework 앱 추가
     'rest_framework_jwt',
     'account',
-    'community'
+    'community',
+    'search',
 ]
 
 MIDDLEWARE = [

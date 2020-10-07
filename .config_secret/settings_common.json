@@ -1,19 +1,19 @@
 {
-  "django": {
-    "secret_key": "9VfHSLWd7mcDw3EyBvnsW8nwCSNr1iqN",
-    "database": {
-      "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "user_schema",
-        "USER": "root",
-        "PASSWORD": "00000000",
-        "HOST": "localhost",
-        "PORT": "3306"
+  "django":{
+      "secret_key" : "9VfHSLWd7mcDw3EyBvnsW8nwCSNr1iqN",
+      "database" : {
+          "default" : {
+              "ENGINE": "django.db.backends.mysql",
+              "NAME": "reviewdb",
+              "USER": "admin",
+              "PASSWORD": "0128gksqls",
+              "HOST": "database-1.ccgwen3yxgnd.us-east-1.rds.amazonaws.com",
+              "PORT": "3306"
+          }
       }
-    }
   },
-  "jwt": {
-    "secret_key": "Kw6ity3sq4gMskQoUGakp1MQFkYttujG",
-    "algorithm": "HS256"
+  "jwt":{
+      "secret_key" : "Kw6ity3sq4gMskQoUGakp1MQFkYttujG",
+      "algorithm" : "HS256"
   }
 }

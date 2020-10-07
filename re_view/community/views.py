@@ -35,7 +35,6 @@ class PostViewSet(viewsets.ModelViewSet):
              return Response("Action denied: Not logged in ", status=status.HTTP_401_UNAUTHORIZED)
             
 
-20201006191138test12345
     def list(self, request):
         
         queryset = Post.objects.all()

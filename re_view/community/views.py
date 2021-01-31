@@ -93,15 +93,9 @@ class GetPostAPI(mixins.ListModelMixin, generics.GenericAPIView):
     serializer_class = PostSerializer
 
     def get(self, request, *args, **kwargs):
-<<<<<<< HEAD
         
         queryset = Post.objects.filter(user=self.kwargs["user_id"])
         
-=======
-
-        queryset = Post.objects.filter(userid=self.kwargs["user_id"])
-
->>>>>>> e9e6f332339757c0fbdaca17e7dfaab145cb8988
         serializer = PostSerializer(queryset, many=True)
 
         return Response(serializer.data)
